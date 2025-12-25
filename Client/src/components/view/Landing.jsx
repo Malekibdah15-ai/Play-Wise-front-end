@@ -4,6 +4,7 @@ import { Search, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 import axios from "axios";
 
+
 const Landing = () => {
   const [query, setQuery] = useState("");
   const [recommendations, setRecommendations] = useState([]);
@@ -164,8 +165,11 @@ const Landing = () => {
                 Buy Now →
               </a>
             )}
-          </div>
+          </div>         
         )}
+        {/* <div>
+        <ChatFilter />
+        </div> */}
       </main>
     </div>
   );
