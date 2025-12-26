@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Search, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import DailyChallenges from "./Callenge";
 
 const Landing = () => {
   const [query, setQuery] = useState("");
@@ -101,6 +102,7 @@ const Landing = () => {
           Tell us what kind of game you want, and AI will recommend the best ones.
         </p>
 
+        <DailyChallenges/>
         {/* SEARCH */}
         <div className="relative w-full max-w-2xl">
           <div className="flex items-center bg-[#0F0F0F] border border-white/10 rounded-full px-5 py-3">
@@ -179,8 +181,11 @@ const Landing = () => {
                 Buy Now →
               </a>
             )}
-          </div>
+          </div>         
         )}
+        {/* <div>
+        <ChatFilter />
+        </div> */}
       </main>
     </div>
   );
