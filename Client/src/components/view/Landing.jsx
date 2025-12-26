@@ -31,7 +31,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500/30 overflow-x-hidden">
       {/* Navigation */}
-      <nav className="flex border-b border-white items-center justify-between px-6 py-5 max-w-7xl mx-auto w-full">
+      {/* <nav className="flex border-b border-white items-center justify-between px-6 py-5 max-w-7xl mx-auto w-full">
         <div className="flex items-center gap-3 cursor-pointer">
           <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.4)]">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -52,7 +52,7 @@ const Landing = () => {
         <div className="md:hidden">
           <Menu className="w-6 h-6 text-gray-300" />
         </div>
-      </nav>
+      </nav> */}
 
       {/* Hero Section */}
       <main className="flex flex-col items-center justify-center px-6 pt-20 md:pt-32 pb-20 text-center max-w-5xl mx-auto">
