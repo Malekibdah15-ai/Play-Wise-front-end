@@ -39,6 +39,20 @@ const Landing = () => {
     }
   };
 
+  return (
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500/30 overflow-x-hidden">
+      {/* Navigation */}
+      {/* <nav className="flex border-b border-white items-center justify-between px-6 py-5 max-w-7xl mx-auto w-full">
+        <div className="flex items-center gap-3 cursor-pointer">
+          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.4)]">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <rect width="20" height="12" x="2" y="6" rx="2" />
+              <circle cx="8" cy="12" r="2" />
+              <circle cx="16" cy="12" r="2" />
+            </svg>
+          </div>
+          <span className="text-xl font-bold tracking-tight">Play wise</span>
+        </div>
   
   const fetchBestDeal = async (gameName) => {
     setDeal(null);
@@ -69,6 +83,7 @@ const Landing = () => {
           </div>
           <span className="text-xl font-bold">Play Wise</span>
         </div>
+      </nav> */}
         <Menu className="md:hidden" />
       </nav>
 
