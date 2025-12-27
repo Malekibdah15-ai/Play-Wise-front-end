@@ -8,6 +8,7 @@ import Auth from './components/view/Auth'
 import { Routes , Route } from 'react-router-dom'
 import Home from './components/view/Home'
 import MainLan from './components/view/MainLan'
+import ProtectedRoute from './components/view/ProtectedRoute'
 
 
 const App = () => {
@@ -15,10 +16,20 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500/30 overflow-x-hidden">
-      <Routes>
-        <Route path="/" element={<MainLan />} />
-        <Route path="/Home" element={<Home />} />
-      </Routes>
+
+      
+        <Routes>
+          <Route path="/auth" element={<Auth initialMode="login" />} />
+          <Route path="/Home" element={<Home />} />
+          <Route
+          path="/" element={
+            <ProtectedRoute>
+              <MainLan/>
+            </ProtectedRoute>
+          }
+        />
+        </Routes>
+      
     </div>
   );
 };

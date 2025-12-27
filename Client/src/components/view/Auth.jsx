@@ -103,7 +103,11 @@ const Auth = ({ initialMode, onViewChange }) => {
     try {
       const { data } = await axios.post(`http://localhost:8000${endpoint}`, payload);
       console.log("SUCCESS:", data);
-      navigate("/home")
+
+      localStorage.setItem("token", data.token); 
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      navigate("/")
     } catch (err) {
       console.log(err.response.data.errors);
       setError(prev => ({ ...prev, password: err.response.data.errors }));
