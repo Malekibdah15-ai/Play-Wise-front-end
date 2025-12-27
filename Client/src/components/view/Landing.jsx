@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Search, Menu } from "lucide-react";
 import { motion } from "framer-motion";
@@ -11,12 +10,10 @@ const Landing = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-
   const [deal, setDeal] = useState(null);
   const [dealLoading, setDealLoading] = useState(false);
   const [dealError, setDealError] = useState("");
 
-  
   const handleSearch = async () => {
     if (!query) return;
 
@@ -30,31 +27,14 @@ const Landing = () => {
         "http://localhost:8000/api/ai/recommend",
         { userInput: query }
       );
-
       setRecommendations(res.data);
     } catch (err) {
-      console.error(err);
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500/30 overflow-x-hidden">
-      {/* Navigation */}
-      {/* <nav className="flex border-b border-white items-center justify-between px-6 py-5 max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-3 cursor-pointer">
-          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.4)]">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-              <rect width="20" height="12" x="2" y="6" rx="2" />
-              <circle cx="8" cy="12" r="2" />
-              <circle cx="16" cy="12" r="2" />
-            </svg>
-          </div>
-          <span className="text-xl font-bold tracking-tight">Play wise</span>
-        </div>
-  
   const fetchBestDeal = async (gameName) => {
     setDeal(null);
     setDealError("");
@@ -67,7 +47,6 @@ const Landing = () => {
       );
       setDeal(res.data);
     } catch (err) {
-      console.error(err);
       setDealError("Unable to fetch deal");
     } finally {
       setDealLoading(false);
@@ -84,7 +63,6 @@ const Landing = () => {
           </div>
           <span className="text-xl font-bold">Play Wise</span>
         </div>
-      </nav> */}
         <Menu className="md:hidden" />
       </nav>
 
@@ -99,17 +77,17 @@ const Landing = () => {
         </motion.h1>
 
         <p className="text-gray-400 mb-10 max-w-xl">
-          Tell us what kind of game you want, and AI will recommend the best ones.
+          Tell us what kind of game you want, and Gemini AI will recommend the best ones.
         </p>
+        <DailyChallenges />
 
-        <DailyChallenges/>
         {/* SEARCH */}
         <div className="relative w-full max-w-2xl">
           <div className="flex items-center bg-[#0F0F0F] border border-white/10 rounded-full px-5 py-3">
             <Search className="text-gray-500 mr-2" />
             <input
               type="text"
-              placeholder="Search for games..."
+              placeholder="search for games..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="bg-transparent outline-none flex-1 text-gray-200"
@@ -123,15 +101,14 @@ const Landing = () => {
           </div>
         </div>
 
-        {loading && <p className="mt-4 text-gray-400">Loading...</p>}
+        {loading && <p className="mt-4 text-gray-400">Thinking...</p>}
         {error && <p className="mt-4 text-red-500">{error}</p>}
 
-      
         {recommendations.length > 0 && (
-          <div className="mt-10 w-full max-w-3xl flex flex-col gap-4">
+          <div className="mt-12 w-full max-w-3xl flex flex-col gap-4">
             {recommendations.map((game, idx) => (
               <div
-                key={game.name || idx}
+                key={idx}
                 className="bg-[#1A1A1A] border border-white/10 rounded-xl p-5 text-left"
               >
                 <h3 className="text-xl font-bold">{game.name}</h3>
@@ -151,6 +128,7 @@ const Landing = () => {
           </div>
         )}
 
+       
         {dealLoading && (
           <p className="mt-6 text-gray-400">Searching for best deal...</p>
         )}
@@ -181,14 +159,14 @@ const Landing = () => {
                 Buy Now →
               </a>
             )}
-          </div>         
+          </div>
         )}
-        {/* <div>
-        <ChatFilter />
-        </div> */}
+        
+
       </main>
     </div>
   );
 };
 
 export default Landing;
+
