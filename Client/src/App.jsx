@@ -5,6 +5,8 @@ import Home from './components/view/Home'
 import MainLan from './components/view/MainLan'
 import { useSession } from './context/SessionContext'
 import JoinHub from './components/view/JoinHub'
+import ProtectedRoute from './components/view/ProtectedRoute'
+
 
 const App = () => {
   const [currentView, setCurrentView] = useState('landing');

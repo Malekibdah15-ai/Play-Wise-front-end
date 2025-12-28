@@ -6,6 +6,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import socket from '../../socket';
 
+import DailyChallenges from "./Callenge";
 
 const Landing = ({ onViewChange }) => {
   const navigate = useNavigate();
@@ -15,6 +16,9 @@ const Landing = ({ onViewChange }) => {
   const [error, setError] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
 
+  const [deal, setDeal] = useState(null);
+  const [dealLoading, setDealLoading] = useState(false);
+  const [dealError, setDealError] = useState("");
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -29,6 +33,12 @@ const Landing = ({ onViewChange }) => {
       setRecommendations(res.data.games);
     } catch (err) {
       console.log(err);
+      const res = await axios.post(
+        "http://localhost:8000/api/ai/recommend",
+        { userInput: query }
+      );
+      setRecommendations(res.data);
+    } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -41,6 +51,21 @@ const Landing = ({ onViewChange }) => {
       opacity: 1,
       scale: 1,
       transition: { staggerChildren: 0.1, duration: 0.4, ease: "easeOut" }
+  const fetchBestDeal = async (gameName) => {
+    setDeal(null);
+    setDealError("");
+    setDealLoading(true);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/ai/deal",
+        { gameName }
+      );
+      setDeal(res.data);
+    } catch (err) {
+      setDealError("Unable to fetch deal");
+    } finally {
+      setDealLoading(false);
     }
   };
 
@@ -51,7 +76,19 @@ const Landing = ({ onViewChange }) => {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans overflow-x-hidden">
-      <main className="flex flex-col items-center px-6 pt-24 text-center max-w-5xl mx-auto pb-20">
+      {/* NAV */}
+      <nav className="flex border-b border-white/10 items-center justify-between px-6 py-5 max-w-7xl mx-auto">
+        <div className="flex items-center gap-3">
+          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl">
+            🎮
+          </div>
+          <span className="text-xl font-bold">Play Wise</span>
+        </div>
+        <Menu className="md:hidden" />
+      </nav>
+
+      {/* HERO */}
+      <main className="flex flex-col items-center px-6 pt-24 text-center max-w-5xl mx-auto">
         <motion.h1
           initial={{ opacity: 0, y: -40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -60,13 +97,18 @@ const Landing = ({ onViewChange }) => {
           Discover Your Next Gaming Adventure
         </motion.h1>
 
-        {/* SEARCH BAR */}
-        <div className="relative w-full max-w-2xl mb-12">
-          <div className="flex items-center bg-[#0F0F0F] border border-white/10 rounded-full px-5 py-3 shadow-lg shadow-purple-500/5">
+        <p className="text-gray-400 mb-10 max-w-xl">
+          Tell us what kind of game you want, and Gemini AI will recommend the best ones.
+        </p>
+        <DailyChallenges />
+
+        {/* SEARCH */}
+        <div className="relative w-full max-w-2xl">
+          <div className="flex items-center bg-[#0F0F0F] border border-white/10 rounded-full px-5 py-3">
             <Search className="text-gray-500 mr-2" />
             <input
               type="text"
-              placeholder="Search for games..."
+              placeholder="search for games..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -80,43 +122,29 @@ const Landing = ({ onViewChange }) => {
             </button>
           </div>
         </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: 1.4,
-            scale: { type: "spring", visualDuration: 0.4, bounce: 0.5 },
-          }}
-          className="mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
-          {['Action', 'RPG', 'Strategy', 'horror'].map((tag, index) => (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                delay: index * 0.5,
-                type: "spring",
-                stiffness: 300,
-              }}
-              whileHover={{ scale: 1.1 }}
-              className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-gray-400 hover:border-purple-500/50 cursor-pointer transition-colors">
-              {tag}
-            </motion.span>
-          ))}
 
-        </motion.div>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {loading && <p className="mt-4 text-gray-400">Thinking...</p>}
+        {error && <p className="mt-4 text-red-500">{error}</p>}
 
-        {/* LOADING SKELETON */}
-        {loading && (
-          <div className="w-full max-w-3xl flex flex-col gap-6 mb-12">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="bg-[#1A1A1A] border border-white/5 rounded-2xl p-6">
-                <div className="flex justify-between mb-4">
-                  <Skeleton variant="text" sx={{ bgcolor: 'grey.900' }} width="40%" height={40} />
-                  <Skeleton variant="rectangular" sx={{ bgcolor: 'grey.900', borderRadius: 2 }} width={60} height={30} />
-                </div>
-                <Skeleton variant="text" sx={{ bgcolor: 'grey.900' }} width="20%" height={20} className="mb-4" />
-                <Skeleton variant="rectangular" sx={{ bgcolor: 'grey.900', borderRadius: 2 }} width="100%" height={80} />
+        {recommendations.length > 0 && (
+          <div className="mt-12 w-full max-w-3xl flex flex-col gap-4">
+            {recommendations.map((game, idx) => (
+              <div
+                key={idx}
+                className="bg-[#1A1A1A] border border-white/10 rounded-xl p-5 text-left"
+              >
+                <h3 className="text-xl font-bold">{game.name}</h3>
+                <p className="text-gray-400 mt-1">{game.description}</p>
+                <p className="text-yellow-400 mt-2">
+                  Rating: {game.rating}/5
+                </p>
+
+                <button
+                  onClick={() => fetchBestDeal(game.name)}
+                  className="mt-3 bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-sm font-semibold"
+                >
+                  Find Best Deal
+                </button>
               </div>
             ))}
           </div>
@@ -228,6 +256,21 @@ const Landing = ({ onViewChange }) => {
             <FeatureCard Icon={Gamepad2} title="Deep Library" desc="10k+ titles tracked across platforms." />
           </motion.div>
         </motion.section>
+
+            {deal.buyLink && (
+              <a
+                href={deal.buyLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 text-purple-400 hover:underline"
+              >
+                Buy Now →
+              </a>
+            )}
+          </div>
+        )}
+        
+
       </main>
 
       <footer className="border-t border-white/5 py-10 text-center text-gray-600 text-sm">
