@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import {
-  Mail,
-  Lock,
-  User,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Gamepad2,
-} from "lucide-react";
+import { Mail , Lock , User , Eye , EyeOff , ArrowRight , Gamepad2 ,} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSession } from "../../context/SessionContext";
 
 const Auth = ({ initialMode, onViewChange }) => {
   const navigate = useNavigate()
+  const { login } = useSession();
   const [isLogin, setIsLogin] = useState(initialMode === "login");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -64,7 +58,6 @@ const Auth = ({ initialMode, onViewChange }) => {
   //   real live validateion 
   const validateField = (field, value) => {
     let message = "";
-
     switch (field) {
       case "username":
         if (!value.trim()) message = "Username is required";
@@ -89,7 +82,7 @@ const Auth = ({ initialMode, onViewChange }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    // prevent submission if any errors exist
+
     if (!isLogin) {
       if (error.username || error.password || error.password) return;
     }
@@ -102,12 +95,11 @@ const Auth = ({ initialMode, onViewChange }) => {
 
     try {
       const { data } = await axios.post(`http://localhost:8000${endpoint}`, payload);
-      console.log("SUCCESS:", data);
+      console.log(data.user);
 
-      localStorage.setItem("token", data.token); 
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      navigate("/")
+      login(data.user);
+      console.log(data.user);
+      navigate("/home")
     } catch (err) {
       console.log(err.response.data.errors);
       setError(prev => ({ ...prev, password: err.response.data.errors }));
