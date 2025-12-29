@@ -142,11 +142,11 @@ const Landing = ({ onViewChange }) => {
                   </div>
 
                   <div className="flex gap-2 mb-3">
-                    {game.genre?.map((g) => (
-                      <span key={g} className="text-[10px] px-2 py-1 bg-purple-900/30 text-purple-300 rounded-md border border-purple-500/20 uppercase">
-                        {g}
+
+                      <span className="text-[10px] px-2 py-1 bg-purple-900/30 text-purple-300 rounded-md border border-purple-500/20 uppercase">
+                        {game.genre}
                       </span>
-                    ))}
+                    
                   </div>
 
                   <p className="text-gray-400 text-sm line-clamp-2 mb-4">{game.description}</p>
