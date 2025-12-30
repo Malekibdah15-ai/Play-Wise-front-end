@@ -101,7 +101,7 @@ const Auth = ({ initialMode, onViewChange }) => {
       console.log(data.user);
       navigate("/home")
     } catch (err) {
-      console.log(err.response.data.errors);
+      console.log(err.response);
       setError(prev => ({ ...prev, password: err.response.data.errors }));
     } finally {
       setLoading(false);
