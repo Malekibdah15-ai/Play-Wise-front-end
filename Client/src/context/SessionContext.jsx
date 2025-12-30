@@ -14,7 +14,7 @@ export const SessionProvider = ({ children }) => {
 
   const login = (userData) => {
     localStorage.setItem('app_user', JSON.stringify(userData));
-    
+
     setSession({
       user: userData,
       isAuthenticated: true,
@@ -26,8 +26,14 @@ export const SessionProvider = ({ children }) => {
     setSession({ user: null, isAuthenticated: false });
   };
 
+  const updateSessionUser = (newData) => {
+    setSession(prev => ({
+      ...prev,
+      user: { ...prev.user, ...newData }
+    }));
+  };
   return (
-    <SessionContext.Provider value={{ session, login, logout }}>
+    <SessionContext.Provider value={{ session, login, logout, updateSessionUser }}>
       {children}
     </SessionContext.Provider>
   );
