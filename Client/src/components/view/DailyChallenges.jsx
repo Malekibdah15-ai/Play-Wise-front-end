@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flame, CheckCircle2 } from "lucide-react";
+import axios from "axios";
 
 const DailyChallenges = () => {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const fetchChallenges = async () => {
+const fetchChallenges = async () => {
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8000/api/ai/challenges");
-      if (!res.ok) throw new Error("Failed");
 
-      const data = await res.json();
+      const res = await axios.get("http://localhost:8000/routes/challengeroutes");
+      const data = res.data;
 
       const formatted = data.map((c, idx) => ({
         id: idx + 1,
@@ -27,6 +27,7 @@ const DailyChallenges = () => {
       setChallenges(formatted);
     } catch (err) {
       setError("Daily challenges unavailable today");
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
