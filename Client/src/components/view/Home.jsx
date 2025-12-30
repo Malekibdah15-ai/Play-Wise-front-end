@@ -9,6 +9,7 @@ import Navbar from "./NavBar";
 import axios from "axios";
 import socket from "../../socket";
 import { useSession } from "../../context/SessionContext";
+import { Link } from "react-router-dom";
 
 const Home = () => {
     const { session } = useSession();
@@ -131,7 +132,7 @@ const Home = () => {
                                         <div className="hidden sm:flex pl-6 pr-3 text-gray-400"><Search size={22} /></div>
                                         <input
                                             type="text"
-                                            placeholder="e.g. 'A cozy farming sim with a dark twist'..."
+                                            placeholder="e.g. search for games..."
                                             value={query}
                                             onChange={(e) => setQuery(e.target.value)}
                                             className="bg-transparent outline-none flex-1 text-white h-14 px-4 sm:px-0 text-lg placeholder:text-gray-500 w-full"
@@ -307,6 +308,13 @@ const Home = () => {
                             </form>
                         </motion.div>
                     )}
+                    <div className="mt-12 flex justify-center">
+                        <Link
+                            to="/ai"
+                                className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl font-bold transition-all">
+                           Go to AI Matchmaker
+                        </Link>
+                   </div>
 
                     <hr className="border-white/5 mb-20" />
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">

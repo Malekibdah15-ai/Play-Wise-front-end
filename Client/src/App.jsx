@@ -6,7 +6,7 @@ import MainLan from './components/view/MainLan'
 import { useSession } from './context/SessionContext'
 import JoinHub from './components/view/JoinHub'
 import ProtectedRoute from './components/view/ProtectedRoute'
-
+import AiMatchmaker from './components/view/AiMatchmaker'
 
 const App = () => {
   const [currentView, setCurrentView] = useState('landing');
@@ -20,6 +20,7 @@ return (
             <Route path="/Mes" element={<JoinHub />} />
             <Route path="/home" element={<Home />} />
             <Route path="*" element={<Home />} />
+            <Route path="/ai" element={<AiMatchmaker />} />
 
           </>)}
         {!session.isAuthenticated && (
