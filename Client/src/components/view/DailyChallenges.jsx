@@ -20,7 +20,6 @@ const fetchChallenges = async () => {
       const formatted = data.map((c, idx) => ({
         id: idx + 1,
         title: c.challenge,
-        reward: `${(idx + 1) * 250} XP`,
         completed: false,
       }));
 
@@ -120,4 +119,3 @@ const fetchChallenges = async () => {
 };
 
 export default DailyChallenges;
-
