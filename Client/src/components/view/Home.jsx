@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Search, Tag, Play, ExternalLink, Info, MessageSquare, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton, Box } from "@mui/material";
@@ -24,15 +24,39 @@ const Home = () => {
     // Chat States
     const [messages, setMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
+    
+    // Ref for the bottom of the chat
+    const messagesEndRef = useRef(null);
 
-    // 1. Sync communities on login/mount
+    // 1. Helper: Formats the date to a readable time (e.g., 08:45 PM)
+    const formatTime = (timestamp) => {
+        if (!timestamp) return "Just now";
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    // 2. Auto-scroll logic with rendering delay fix
+    useEffect(() => {
+        if (view === "Chat" && messages.length > 0) {
+            // Small timeout ensures the DOM has rendered the new bubble height
+            const timer = setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ 
+                    behavior: "smooth", 
+                    block: "end" 
+                });
+            }, 100); 
+            return () => clearTimeout(timer);
+        }
+    }, [messages, view]);
+
+    // 3. Sync communities on login/mount
     useEffect(() => {
         if (session.user?.communities) {
             socket.emit("sync-my-communities", session.user.communities);
         }
     }, [session.user]);
 
-    // 2. Chat Message Listener
+    // 4. Chat Message Listener
     useEffect(() => {
         const handleMessage = (newMessage) => {
             if (newMessage.genre === activeGenre) {
@@ -88,7 +112,8 @@ const Home = () => {
         const messageData = {
             genre: activeGenre,
             content: chatInput,
-            user_id: session.user?._id || "Guest"
+            user_id: session.user?._id || "Guest",
+            createdAt: new Date().toISOString()
         };
 
         socket.emit("send-message", messageData);
@@ -103,11 +128,9 @@ const Home = () => {
 
     return (
         <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-purple-500/30">
-            {/* Sidebar with the Logo separated from the community action */}
             <Sidebar onSelectCommunity={(comm) => joinHub(comm)} />
 
             <div className="md:pl-20 lg:pl-64 transition-all duration-300 relative">
-
                 <Navbar disabled currentView={view} onViewChange={setView} />
 
                 <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 pt-12 pb-20">
@@ -144,7 +167,6 @@ const Home = () => {
                                 </form>
                             </header>
 
-                            {/* RESULTS AREA */}
                             <div className="mb-20">
                                 <AnimatePresence>
                                     {analysisSummary && !loading && (
@@ -161,7 +183,6 @@ const Home = () => {
                                     )}
                                 </AnimatePresence>
 
-                                {/* LOADING STATE (Skeleton) */}
                                 {loading && (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                         {[1, 2, 3].map((i) => (
@@ -174,8 +195,6 @@ const Home = () => {
                                         ))}
                                     </div>
                                 )}
-
-                                {/* CARDS GRID */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                     {recommendations.map((game, idx) => (
                                         <motion.div
@@ -215,15 +234,11 @@ const Home = () => {
                                                         onClick={() => joinHub(game.genre)}
                                                         className="group relative flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-purple-500/50 transition-all duration-300 overflow-hidden"
                                                     >
-                                                        {/* Glow Layer */}
                                                         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-
                                                         <div className="relative flex items-center justify-center">
                                                             <Tag size={13} className="text-purple-500 z-10" />
                                                             <span className="absolute inset-0 animate-ping bg-purple-500/20 rounded-full" />
                                                         </div>
-
                                                         <div className="flex flex-col items-start leading-tight relative z-10">
                                                             <span className="text-[10px] font-bold uppercase tracking-tight text-gray-200">
                                                                 {session.user?.communities?.includes(game.genre)
@@ -231,8 +246,6 @@ const Home = () => {
                                                                     : `Join ${game.genre} Hub`}
                                                             </span>
                                                         </div>
-
-
                                                         <motion.div
                                                             initial={{ opacity: 0, x: -3 }}
                                                             whileHover={{ opacity: 1, x: 0 }}
@@ -284,15 +297,28 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                                {messages.map((m, i) => (
-                                    <div key={m._id || i} className={`flex flex-col ${m.sender?._id === session.user._id ? "items-end" : "items-start"}`}>
-                                        <span className="text-[10px] text-gray-500 mb-1 px-2">{m.sender?.userName || "User"}</span>
-                                        <div className={`max-w-[70%] p-3 rounded-2xl ${m.sender?._id === session.user._id ? "bg-purple-600 text-white rounded-tr-none" : "bg-white/10 text-gray-200 rounded-tl-none"}`}>
-                                            {m.content}
+                            {/* MESSAGES AREA */}
+                            <div className="flex-1 overflow-y-auto p-6 space-y-4 flex flex-col">
+                                {messages.map((m, i) => {
+                                    const isMe = m.sender?._id === session.user?._id;
+                                    return (
+                                        <div key={m._id || i} className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+                                            <div className="flex items-center gap-2 mb-1 px-2">
+                                                <span className={`text-[10px] font-bold ${isMe ? "text-gray-400" : "text-purple-400"}`}>
+                                                    {isMe ? "You" : (m.sender?.userName || "User")}
+                                                </span>
+                                                <span className="text-[10px] text-gray-500">
+                                                    {formatTime(m.createdAt || m.time)}
+                                                </span>
+                                            </div>
+                                            <div className={`max-w-[70%] p-3 rounded-2xl ${isMe ? "bg-purple-600 text-white rounded-tr-none" : "bg-white/10 text-gray-200 rounded-tl-none"}`}>
+                                                {m.content}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
+                                {/* Invisible scroll target */}
+                                <div ref={messagesEndRef} className="h-0 w-0" />
                             </div>
 
                             <form onSubmit={sendChatMessage} className="p-4 bg-white/5 border-t border-white/5 flex gap-2">
@@ -316,7 +342,7 @@ const Home = () => {
                         </Link>
                    </div>
 
-                    <hr className="border-white/5 mb-20" />
+                    <hr className="border-white/5 mb-20 mt-20" />
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                         <div className="lg:col-span-8"><NewsSection /></div>
                         <div className="lg:col-span-4"><DailyChallenges /></div>

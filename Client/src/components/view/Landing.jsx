@@ -47,6 +47,7 @@ const Landing = ({ onViewChange }) => {
     visible: { opacity: 1, y: 0, scale: 1 }
   };
 
+  
   return (
     <div className="min-h-screen bg-black text-white font-sans overflow-x-hidden">
       <main className="flex flex-col items-center px-6 pt-24 text-center max-w-5xl mx-auto pb-20">
