@@ -173,7 +173,6 @@ const Home = () => {
                                         ))}
                                     </div>
                                 )}
-
                                 {/* CARDS GRID */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                     {recommendations.map((game, idx) => (
@@ -308,6 +307,8 @@ const Home = () => {
                         </motion.div>
                     )}
 
+
+                    {/* This is the section for News and Daily Challenges */}
                     <hr className="border-white/5 mb-20" />
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                         <div className="lg:col-span-8"><NewsSection /></div>
