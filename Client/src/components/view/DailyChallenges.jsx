@@ -14,7 +14,7 @@ const fetchChallenges = async () => {
 
     try {
 
-      const res = await axios.get("http://localhost:8000/routes/challengeroutes");
+      const res = await axios.get("http://localhost:8000/api/ai/challenges");
       const data = res.data;
 
       const formatted = data.map((c, idx) => ({

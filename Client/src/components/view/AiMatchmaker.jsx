@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Gamepad2, Clock, Brain } from "lucide-react";
+import { Link } from "react-router-dom";
 import AnimatedBackground from "./Animate";
 
 const AiMatchmaker = () => {
@@ -29,7 +30,7 @@ const AiMatchmaker = () => {
       const data = await res.json();
       setResult(data);
     } catch (err) {
-      console.error(err);
+      console.error("Matchmaker error:", err);
     } finally {
       setLoading(false);
     }
@@ -37,11 +38,22 @@ const AiMatchmaker = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden flex items-center justify-center px-4">
+
       {/* Animated Background */}
       <AnimatedBackground />
 
-      {/* Dark overlay for contrast */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/90 z-0" />
+
+      {/* Home Button */}
+      <div className="absolute top-6 left-6 z-10">
+        <Link
+          to="/home"
+          className="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2 rounded-xl font-bold transition shadow-lg"
+        >
+          ← Home
+        </Link>
+      </div>
 
       {/* Main Card */}
       <motion.div
@@ -126,38 +138,40 @@ const AiMatchmaker = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 bg-[#0f0f0f] border border-purple-500/30 rounded-xl p-4"
           >
-            <h2 className="text-lg font-bold text-purple-400">
-              {result.name}
-            </h2>
+            {result.name && (
+              <h2 className="text-lg font-bold text-purple-400">
+                {result.name}
+              </h2>
+            )}
 
-            <p className="text-gray-300 text-sm mt-2">
-              {result.reason}
-            </p>
+            {result.reason && (
+              <p className="text-gray-300 text-sm mt-2">
+                {result.reason}
+              </p>
+            )}
 
-            <p className="text-yellow-400 mt-2 font-semibold">
-               {result.rating} 
-            </p>
+            {result.rating && (
+              <p className="text-yellow-400 mt-2 font-semibold">
+                ⭐ {result.rating} / 5
+              </p>
+            )}
 
-            <div className="h-px w-full bg-white/10 my-3" />
-
-            {/* Image */}
             {result.image && (
               <img
                 src={result.image}
                 alt={result.name}
-                className="w-full h-48 object-cover rounded-xl mb-4"
+                className="w-full h-48 object-cover rounded-xl mt-4"
               />
             )}
 
-            {/* Buy Link */}
             {result.buyLink && (
               <a
                 href={result.buyLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg font-semibold"
+                className="inline-block mt-4 bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg font-semibold"
               >
-                Buy on {result.store} ({result.price})
+                Buy on {result.store || "Store"} ({result.price || "View"})
               </a>
             )}
           </motion.div>
