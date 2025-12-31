@@ -12,7 +12,7 @@ import { useSession } from "../../context/SessionContext";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-    const { session } = useSession();
+    const { session, updateSessionUser } = useSession();
     const [view, setView] = useState("Home");
     const [activeGenre, setActiveGenre] = useState(null);
     const [query, setQuery] = useState("");
@@ -24,9 +24,22 @@ const Home = () => {
     // Chat States
     const [messages, setMessages] = useState([]);
     const [chatInput, setChatInput] = useState("");
-    
+
     // Ref for the bottom of the chat
     const messagesEndRef = useRef(null);
+
+    // Load saved search results from localStorage
+    useEffect(() => {
+        const pendingResults = localStorage.getItem("last_search_results");
+        if (pendingResults) {
+            // 1. Set your dashboard state with these results
+            setRecommendations(JSON.parse(pendingResults));
+
+            // 2. Clean up so it doesn't pop up every time they log in
+            localStorage.removeItem("last_search_results");
+            localStorage.removeItem("last_query");
+        }
+    }, []);
 
     // 1. Helper: Formats the date to a readable time (e.g., 08:45 PM)
     const formatTime = (timestamp) => {
@@ -40,11 +53,11 @@ const Home = () => {
         if (view === "Chat" && messages.length > 0) {
             // Small timeout ensures the DOM has rendered the new bubble height
             const timer = setTimeout(() => {
-                messagesEndRef.current?.scrollIntoView({ 
-                    behavior: "smooth", 
-                    block: "end" 
+                messagesEndRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "end"
                 });
-            }, 100); 
+            }, 100);
             return () => clearTimeout(timer);
         }
     }, [messages, view]);
@@ -74,11 +87,13 @@ const Home = () => {
         setLoading(true);
         setError("");
         setView("Home");
-
+        setRecommendations([]);
         try {
             const res = await axios.post("http://localhost:8000/api/ai/recommend", {
                 userInput: query,
             });
+            console.log(res.data.games);
+            
             setRecommendations(res.data.games || []);
             setAnalysisSummary(res.data.analysis_summary || "");
         } catch (err) {
@@ -95,6 +110,10 @@ const Home = () => {
         });
         setActiveGenre(genreSlug);
         setView("Chat");
+        if (!session.user?.communities?.includes(genreSlug)) {
+        const updatedList = [...(session.user?.communities || []), genreSlug];
+        updateSessionUser({ communities: updatedList });
+        }
 
         try {
             const res = await axios.get(`http://localhost:8000/api/messages/${genreSlug}`);
@@ -184,8 +203,8 @@ const Home = () => {
                                 </AnimatePresence>
 
                                 {loading && (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                        {[1, 2, 3].map((i) => (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
+                                        {[1, 2].map((i) => (
                                             <Box key={i} sx={{ bgcolor: '#0F0F0F', p: 3, borderRadius: 6, border: '1px solid #1A1A1A' }}>
                                                 <Skeleton variant="rectangular" height={200} sx={{ bgcolor: '#1A1A1A', borderRadius: 4, mb: 3 }} />
                                                 <Skeleton variant="text" width="60%" height={32} sx={{ bgcolor: '#1A1A1A', mb: 1 }} />
@@ -195,7 +214,7 @@ const Home = () => {
                                         ))}
                                     </div>
                                 )}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
                                     {recommendations.map((game, idx) => (
                                         <motion.div
                                             key={idx}
